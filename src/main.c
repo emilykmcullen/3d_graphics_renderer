@@ -1,10 +1,19 @@
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdint.h> 
 #include <SDL2/SDL.h>
 
 SDL_Window* window;
 SDL_Renderer* renderer;
 bool is_running;
+int window_width = 800;
+int window_height = 600;
+
+//Declare a pointer to an array of uint32 elements
+uint32_t* color_buffer = NULL;
+
+SDL_Texture* color_buffer_texture = NULL;
+
 
 //in c if I leave the arguments empty, you can enter any number of arguments
 bool initialize_window(void)
@@ -16,7 +25,7 @@ bool initialize_window(void)
     }
 
     //Create SDL Window
-    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 800, 600, SDL_WINDOW_BORDERLESS);
+    window = SDL_CreateWindow(NULL, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, window_width, window_height, SDL_WINDOW_BORDERLESS);
     if (!window)
     {
         fprintf(stderr, "Error creating SDL window.\n");
@@ -36,6 +45,19 @@ bool initialize_window(void)
 
 void setup(void)
 {
+    //Allocate the required memory in bytes for the buffer
+    color_buffer = (uint32_t*)malloc(sizeof(uint32_t) * window_width * window_height);
+
+    if (!color_buffer)
+    {
+        //todo
+    }
+    else
+    {
+        //todo
+    }
+    //Set up the texture
+    color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
 
 }
 
@@ -61,11 +83,47 @@ void update(void)
 
 }
 
+void render_color_buffer(void)
+{
+    //final param is the width of our row
+    SDL_UpdateTexture(color_buffer_texture, NULL, color_buffer, (int)(window_width * sizeof(uint32_t)));
+    SDL_RenderCopy(renderer, color_buffer_texture, NULL, NULL);
+}
+
+void clear_color_buffer(uint32_t color)
+{
+    for (int i = 0; i < (window_width * window_height); i++)
+    {
+        color_buffer[i] = color;
+    }
+
+    // for (int y = 0; y < window_height; y++)
+    // {
+    //     for (int x = 0; x < window_width; x++)
+    //     {
+    //         color_buffer[(window_width * y) + x] = color;
+    //     }
+    // }
+}
+
 void render(void)
 {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0 , 255);
     SDL_RenderClear(renderer);
+
+    clear_color_buffer(0xFFFFFF00);
+
+    render_color_buffer();
+
     SDL_RenderPresent(renderer);
+}
+
+void destroy_window(void)
+{
+    free(color_buffer);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
 }
 
 int main(void)
@@ -81,5 +139,7 @@ int main(void)
         render();
     }
     
+    destroy_window();
+
     return 0;
 }
