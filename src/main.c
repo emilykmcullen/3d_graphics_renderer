@@ -14,6 +14,9 @@ uint32_t* color_buffer = NULL;
 
 SDL_Texture* color_buffer_texture = NULL;
 
+int playerX = 400;
+int playerY = 400;
+
 
 //in c if I leave the arguments empty, you can enter any number of arguments
 bool initialize_window(void)
@@ -82,6 +85,22 @@ void process_input(void)
         case SDL_KEYDOWN:
             if (event.key.keysym.sym == SDLK_ESCAPE)
                 is_running = false;
+            if (event.key.keysym.sym == SDLK_UP)
+            {
+                playerY -= 10;
+            }
+            if (event.key.keysym.sym == SDLK_DOWN)
+            {
+                playerY += 10;
+            }
+            if (event.key.keysym.sym == SDLK_LEFT)
+            {
+                playerX -= 10;
+            }
+            if (event.key.keysym.sym == SDLK_RIGHT)
+            {
+                playerX += 10;
+            }
             break;
     }
 }
@@ -191,34 +210,21 @@ void draw_solid_square(uint32_t color, int originX, int originY, int sideLength)
 
 void draw_circle(uint32_t color, int centreX, int centreY, int radius, int thickness)
 {
-    //centre a, b
-    //( x − a )^2 + ( y − b )^2 = r^2
-
-
-
-    //check the radius between my centre point and the point, if it is equal to radius, draw the cirlce
-    //I don't need to check all points in the window, I can check all points between:
-    // x >= centreX - radius and x <= centreX + radius
-    // y >= centreY - raidus and y <= centreY + radius
-
     for (int y = centreY - radius - thickness; y <= centreY + radius + thickness; y++)
     {
         for (int x = centreX - radius - thickness; x <= centreX + radius + thickness; x++)
         {
-            // if distance is less than radius + 3 and more than raidus - 3 
-            //eg. if raidus is 10:
-            // draw point if distance is less than 13 and more than 7
+            //Calculate distance between current x,y point and centre point
             int x2 = (x - centreX)*(x - centreX);
             int y2 = (y - centreY)*(y - centreY);
             int distance = sqrt(x2 + y2);
+            //If distance is close to radius, draw point
             if (distance <= (radius + thickness) && distance >= (radius - thickness))
             {
                 color_buffer[(window_width * y) + x] = color;
             }
         }
     }
-
-
 }
 
 void render(void)
@@ -231,7 +237,7 @@ void render(void)
 
     //draw_square(0xFF0000FF, 100, 150, 100);
     //draw_solid_square(0xFF0000FF, 300, 300, 100);
-    draw_circle(0xFF0000FF, 400, 450, 50, 5);
+    draw_circle(0xFF0000FF, playerX, playerY, 50, 5);
 
 
     render_color_buffer();
