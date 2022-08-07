@@ -140,6 +140,11 @@ void draw_grid(uint32_t color, int rowSize, int columnSize)
 
 void draw_square(uint32_t color, int originX, int originY, int sideLength)
 {
+    if (originX + sideLength > window_width || originY + sideLength > window_height)
+    {
+        printf("Square out of bounds of window\n");
+        return;
+    }
     //start at origin and fill in the row until x = x + sideLength
     // fill in the column until y = y + sidelength
     // fille in the row at y + sidelength until x = x + sidelength
@@ -167,6 +172,55 @@ void draw_square(uint32_t color, int originX, int originY, int sideLength)
     }
 }
 
+void draw_solid_square(uint32_t color, int originX, int originY, int sideLength)
+{
+    if (originX + sideLength > window_width || originY + sideLength > window_height)
+    {
+        printf("Solid square out of bounds of window\n");
+        return;
+    }
+    //for each y, colour every x from x to x + sidelength
+    for (int y = originY; y < originY + sideLength; y++)
+    {
+        for (int x = originX; x < originX + sideLength; x++)
+        {
+            color_buffer[(window_width * y) + x] = color;
+        }
+    }
+}
+
+void draw_circle(uint32_t color, int centreX, int centreY, int radius, int thickness)
+{
+    //centre a, b
+    //( x − a )^2 + ( y − b )^2 = r^2
+
+
+
+    //check the radius between my centre point and the point, if it is equal to radius, draw the cirlce
+    //I don't need to check all points in the window, I can check all points between:
+    // x >= centreX - radius and x <= centreX + radius
+    // y >= centreY - raidus and y <= centreY + radius
+
+    for (int y = centreY - radius - thickness; y <= centreY + radius + thickness; y++)
+    {
+        for (int x = centreX - radius - thickness; x <= centreX + radius + thickness; x++)
+        {
+            // if distance is less than radius + 3 and more than raidus - 3 
+            //eg. if raidus is 10:
+            // draw point if distance is less than 13 and more than 7
+            int x2 = (x - centreX)*(x - centreX);
+            int y2 = (y - centreY)*(y - centreY);
+            int distance = sqrt(x2 + y2);
+            if (distance <= (radius + thickness) && distance >= (radius - thickness))
+            {
+                color_buffer[(window_width * y) + x] = color;
+            }
+        }
+    }
+
+
+}
+
 void render(void)
 {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0 , 255);
@@ -175,7 +229,10 @@ void render(void)
     clear_color_buffer(0xFFFFFF00);
     draw_grid(0xFF00FF00, 5, 40);
 
-    draw_square(0xFF0000FF, 100, 150, 100);
+    //draw_square(0xFF0000FF, 100, 150, 100);
+    //draw_solid_square(0xFF0000FF, 300, 300, 100);
+    draw_circle(0xFF0000FF, 400, 450, 50, 5);
+
 
     render_color_buffer();
 
