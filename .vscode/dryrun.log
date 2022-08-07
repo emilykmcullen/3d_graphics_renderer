@@ -1,5 +1,6 @@
-make --dry-run --keep-going --print-directory
+make --dry-run --always-make --keep-going --print-directory
 make: Entering directory `/Users/emilycullen/Desktop/3dRendererProject'
 gcc -Wall -std=c99 ./src/*.c -lSDL2 -o renderer 
+ 
 make: Leaving directory `/Users/emilycullen/Desktop/3dRendererProject'
  

@@ -58,6 +58,14 @@ void setup(void)
     }
     //Set up the texture
     color_buffer_texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, window_width, window_height);
+    if (!color_buffer_texture)
+    {
+        //todo
+    }
+    else
+    {
+        //todo
+    }
 
 }
 
@@ -106,12 +114,68 @@ void clear_color_buffer(uint32_t color)
     // }
 }
 
+void draw_grid(uint32_t color, int rowSize, int columnSize)
+{
+    for (int y = 0; y < window_height; y++)
+    {
+        if (y % rowSize == 0)
+        {
+            for (int x = 0; x < window_width; x++)
+            {
+                color_buffer[(window_width * y) + x] = color;
+            }
+        }
+        else
+        {
+            for (int x = 0; x < window_width; x += columnSize)
+            {
+                color_buffer[(window_width * y) + x] = color;
+            }
+        }    
+    }
+
+    // when y = 0, 60, 120, 180, 240, 300, 360, 420, 480, 540, 600, colour the whole x row
+    //otherwise color just x = 0, 80, etc.
+}
+
+void draw_square(uint32_t color, int originX, int originY, int sideLength)
+{
+    //start at origin and fill in the row until x = x + sideLength
+    // fill in the column until y = y + sidelength
+    // fille in the row at y + sidelength until x = x + sidelength
+    // fill in the column at x + sidelength until y = y + sidelength
+
+    for (int y = originY; y <= originY + sideLength; y++)
+    {
+        //draw top and bottom row of the square
+        if (y == originY || y == originY + sideLength)
+        {
+            for (int x = originX; x < originX + sideLength; x++)
+            {
+                color_buffer[(window_width * y) + x] = color;
+            }
+        }
+
+        //draw columns
+        else
+        {
+            //draw x = originX and x = originX + sideLength
+            color_buffer[(window_width * y) + originX] = color;
+            color_buffer[(window_width * y) + originX + sideLength] = color;
+        }
+        
+    }
+}
+
 void render(void)
 {
     SDL_SetRenderDrawColor(renderer, 255, 0, 0 , 255);
     SDL_RenderClear(renderer);
 
     clear_color_buffer(0xFFFFFF00);
+    draw_grid(0xFF00FF00, 5, 40);
+
+    draw_square(0xFF0000FF, 100, 150, 100);
 
     render_color_buffer();
 
